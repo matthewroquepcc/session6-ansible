@@ -1,0 +1,10 @@
+---
+# ansible-lint settings
+profile: basic
+offline: true
+
+exclude_paths:
+  - broken/        # deliberately broken, for the troubleshooting exercise
+  - solutions/     # reference copies
+  - extras/
+  - .git/
