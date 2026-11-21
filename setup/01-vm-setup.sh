@@ -36,11 +36,13 @@ echo "Detected: $PRETTY_NAME"
 sudo -v
 
 export DEBIAN_FRONTEND=noninteractive
+# sudo drops exported env vars; also stop needrestart from prompting
+APT="sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get"
 
 # -----------------------------------------------------------------------------
 step "1/6  Updating package lists and installing base tools"
-sudo apt-get update -y
-sudo apt-get install -y \
+$APT update -y
+$APT install -y \
   openssh-server git curl wget unzip jq \
   software-properties-common python3 python3-pip python3-boto3 python3-botocore \
   pipx yamllint
@@ -55,13 +57,20 @@ else
 fi
 
 # -----------------------------------------------------------------------------
-step "3/6  Installing Ansible from the official PPA"
-if ! grep -rqs "ansible/ansible" /etc/apt/sources.list.d/; then
-  if ! sudo add-apt-repository --yes --update ppa:ansible/ansible; then
-    warn "Could not add the Ansible PPA. Falling back to Ubuntu's own ansible package."
+step "3/6  Installing Ansible"
+# The PPA only publishes for some releases; elsewhere use Ubuntu's own package.
+if [[ "${VERSION_CODENAME:-}" == "jammy" || "${VERSION_CODENAME:-}" == "noble" ]]; then
+  if ! grep -rqs "ansible/ansible" /etc/apt/sources.list.d/; then
+    if ! sudo add-apt-repository --yes --update ppa:ansible/ansible; then
+      warn "Could not add the Ansible PPA. Falling back to Ubuntu's own ansible package."
+      sudo rm -f /etc/apt/sources.list.d/ansible-ubuntu-ansible-*
+      $APT update -y
+    fi
   fi
+else
+  echo "Ubuntu $VERSION_CODENAME: no Ansible PPA for this release, using Ubuntu's ansible package."
 fi
-sudo apt-get install -y ansible
+$APT install -y ansible
 ansible --version | head -1
 
 # The full 'ansible' package ships the amazon.aws collection. Make sure it is there.

@@ -23,6 +23,8 @@ fail() { echo -e "${RED}[x] $*${NC}"; exit 1; }
 
 sudo -v
 export DEBIAN_FRONTEND=noninteractive
+# sudo drops exported env vars; also stop needrestart from prompting
+APT="sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get"
 
 # -----------------------------------------------------------------------------
 step "Checking VM memory"
@@ -34,12 +36,12 @@ fi
 
 # -----------------------------------------------------------------------------
 step "1/4  Installing Java"
-sudo apt-get update -y
+$APT update -y
 if apt-cache show openjdk-21-jre >/dev/null 2>&1; then
-  sudo apt-get install -y fontconfig openjdk-21-jre
+  $APT install -y fontconfig openjdk-21-jre
 else
   warn "openjdk-21-jre not available on this Ubuntu version - installing openjdk-17-jre."
-  sudo apt-get install -y fontconfig openjdk-17-jre
+  $APT install -y fontconfig openjdk-17-jre
 fi
 java -version 2>&1 | head -1
 
@@ -56,8 +58,8 @@ echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] https://pkg.jenkins.
 
 # -----------------------------------------------------------------------------
 step "3/4  Installing Jenkins"
-sudo apt-get update -y
-sudo apt-get install -y jenkins
+$APT update -y
+$APT install -y jenkins
 sudo systemctl enable --now jenkins
 
 # -----------------------------------------------------------------------------

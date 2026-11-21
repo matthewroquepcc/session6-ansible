@@ -98,6 +98,9 @@ bash aws/launch-servers.sh
 This creates a key pair, a security group, and two Ubuntu instances (`web1`, `web2`). It prints their IPs, which are also saved in `~/session6-ips.txt`.
 Test it: `ssh -i ~/.ssh/session6-key.pem ubuntu@<web1-public-ip>` → type `yes` → `exit`.
 
+**Can't launch EC2?** (for example, a new AWS account still in verification) Use the backup instead:
+two local Docker containers that act as web1 and web2. See [docker-fallback/README.md](docker-fallback/README.md).
+
 ## Setup part B: Jenkins (start before the first break)
 
 ```bash
