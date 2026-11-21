@@ -7,4 +7,4 @@
   tasks:
     - name: Print the title
       ansible.builtin.debug:
-        msg: {{ site_title }}
+        msg: "{{ site_title }}"

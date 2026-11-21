@@ -1,0 +1,27 @@
+- name: Install nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+- name: Deploy the homepage from a template
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    mode: "0644"
+- name: Make sure nginx is running
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+- name: Install extra packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ extra_packages }}"
+- name: Deploy nginx site config
+  ansible.builtin.template:
+    src: default-site.conf.j2
+    dest: /etc/nginx/sites-available/default
+    mode: "0644"
+  notify: Reload nginx

@@ -10,7 +10,7 @@
         path: /etc/nginx/nginx.conf
         regexp: '^\s*#?\s*server_tokens'
         line: "        server_tokens off;"
-      notify: reload nginx
+      notify: Reload nginx
 
   handlers:
     - name: Reload nginx
